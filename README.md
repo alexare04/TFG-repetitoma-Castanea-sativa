@@ -76,7 +76,7 @@ Plots insertion age distributions of intact LTR retrotransposons located inside 
 
 ## Input files
 
-Large input files are not included in this repository due to file size limitations. To run the scripts, the required genome assembly, gene annotation and program output files should be placed in a `data/` directory.
+Large input files are not included in this repository due to file size limitations. Supplementary input files and large intermediate files used in the analyses are available from the author upon request. To run the scripts, the required genome assembly, gene annotation and program output files should be placed in a `data/` directory.
 
 Expected main input files:
 
