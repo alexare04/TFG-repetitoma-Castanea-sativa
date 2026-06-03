@@ -134,7 +134,7 @@ To create the conda environment:
 
 ```bash
 conda env create -f environment.yml
-conda activate castanea_repetitome
+conda activate castanea_repetitive_dna
 ```
 
 Some tools, such as EDTA, RepeatMasker and RepeatModeler, may require additional configuration depending on the operating system and local installation.
