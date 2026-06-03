@@ -1,13 +1,9 @@
 # ============================================================
 # Script: 03_ltr_distribution_windows.R
-# Purpose: Calculate gene, Gypsy and Copia density in 1 Mb
+# Purpose: Calculate annotation, Gypsy and Copia density in 1 Mb
 #          genomic windows and generate chromosome-wise plots.
 # Author: Alejandro Arévalo Sánchez
 # ============================================================
-
-# -----------------------------
-# Load libraries
-# -----------------------------
 
 library(GenomicRanges)
 library(GenomeInfoDb)
@@ -22,7 +18,7 @@ library(dplyr)
 # -----------------------------
 
 genes_file <- "data/genomic.gff"
-ltr_file   <- "data/castano_genoma_filtrado.fasta.out.gff3"
+ltr_file <- "data/castano_genoma_filtrado.fasta.out.gff3"
 genome_file <- "data/castano_genoma_filtrado.fasta"
 
 # -----------------------------
@@ -43,10 +39,11 @@ genes <- import(genes_file)
 ltr <- import(ltr_file)
 genome <- readDNAStringSet(genome_file)
 
-# Keep only gene features
-genes <- genes[genes$type == "gene"]
+# IMPORTANTE:
+# No se filtra por genes$type == "gene" para reproducir la figura original.
+# De esta forma se cuentan todas las anotaciones del GFF en cada ventana,
+# como genes, mRNA, exones, CDS, etc.
 
-# Filter Gypsy and Copia elements
 gypsy <- ltr[grepl("LTR/Gypsy", ltr$Classification)]
 copia <- ltr[grepl("LTR/Copia", ltr$Classification)]
 
@@ -76,13 +73,12 @@ windows <- tileGenome(
   cut.last.tile.in.chrom = TRUE
 )
 
-# Count overlaps per window
 windows$genes <- countOverlaps(windows, genes)
 windows$gypsy <- countOverlaps(windows, gypsy)
 windows$copia <- countOverlaps(windows, copia)
 
-# Save window counts
 windows_df <- as.data.frame(windows)
+
 write.table(
   windows_df,
   file = output_table,
@@ -105,13 +101,19 @@ for (chr in chroms) {
   df_chr$mid <- (df_chr$start + df_chr$end) / 2 / 1e6
   
   p_gypsy <- ggplot(df_chr, aes(x = mid, y = gypsy)) +
-    geom_area(alpha = 0.8) +
-    labs(y = "Gypsy / 1 Mb", title = chr) +
+    geom_area(fill = "#7B2CBF", alpha = 0.8) +
+    labs(
+      y = "Gypsy / 1 Mb",
+      title = chr
+    ) +
     theme_minimal()
   
   p_copia <- ggplot(df_chr, aes(x = mid, y = copia)) +
-    geom_area(alpha = 0.8) +
-    labs(y = "Copia / 1 Mb", x = NULL) +
+    geom_area(fill = "#F4A261", alpha = 0.8) +
+    labs(
+      y = "Copia / 1 Mb",
+      x = NULL
+    ) +
     theme_minimal()
   
   p_genes <- ggplot(df_chr, aes(x = mid)) +
@@ -120,11 +122,14 @@ for (chr in chroms) {
       width = 1,
       height = 1
     ) +
-    scale_fill_gradient(low = "white", high = "black") +
+    scale_fill_gradient(
+      low = "white",
+      high = "black"
+    ) +
     labs(
       x = "Position (Mb)",
       y = "Genes / 1 Mb",
-      fill = "Genes"
+      fill = "genes"
     ) +
     theme_minimal() +
     theme(
