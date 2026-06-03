@@ -39,11 +39,6 @@ genes <- import(genes_file)
 ltr <- import(ltr_file)
 genome <- readDNAStringSet(genome_file)
 
-# IMPORTANTE:
-# No se filtra por genes$type == "gene" para reproducir la figura original.
-# De esta forma se cuentan todas las anotaciones del GFF en cada ventana,
-# como genes, mRNA, exones, CDS, etc.
-
 gypsy <- ltr[grepl("LTR/Gypsy", ltr$Classification)]
 copia <- ltr[grepl("LTR/Copia", ltr$Classification)]
 
