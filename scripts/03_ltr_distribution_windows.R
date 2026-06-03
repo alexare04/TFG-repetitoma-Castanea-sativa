@@ -5,6 +5,10 @@
 # Author: Alejandro Arévalo Sánchez
 # ============================================================
 
+# -----------------------------
+# Load libraries
+# -----------------------------
+
 library(GenomicRanges)
 library(GenomeInfoDb)
 library(rtracklayer)
@@ -39,6 +43,7 @@ genes <- import(genes_file)
 ltr <- import(ltr_file)
 genome <- readDNAStringSet(genome_file)
 
+# Filter Gypsy and Copia LTR retrotransposons
 gypsy <- ltr[grepl("LTR/Gypsy", ltr$Classification)]
 copia <- ltr[grepl("LTR/Copia", ltr$Classification)]
 
@@ -48,11 +53,28 @@ copia <- ltr[grepl("LTR/Copia", ltr$Classification)]
 
 common_seqlevels <- intersect(seqlevels(genes), names(genome))
 
-genes <- keepSeqlevels(genes, common_seqlevels, pruning.mode = "coarse")
-gypsy <- keepSeqlevels(gypsy, common_seqlevels, pruning.mode = "coarse")
-copia <- keepSeqlevels(copia, common_seqlevels, pruning.mode = "coarse")
+genes <- keepSeqlevels(
+  genes,
+  common_seqlevels,
+  pruning.mode = "coarse"
+)
 
-chrom_lengths <- setNames(width(genome[common_seqlevels]), common_seqlevels)
+gypsy <- keepSeqlevels(
+  gypsy,
+  common_seqlevels,
+  pruning.mode = "coarse"
+)
+
+copia <- keepSeqlevels(
+  copia,
+  common_seqlevels,
+  pruning.mode = "coarse"
+)
+
+chrom_lengths <- setNames(
+  width(genome[common_seqlevels]),
+  common_seqlevels
+)
 
 seqlengths(genes) <- chrom_lengths
 seqlengths(gypsy) <- chrom_lengths
@@ -68,11 +90,17 @@ windows <- tileGenome(
   cut.last.tile.in.chrom = TRUE
 )
 
+# Count overlaps per window
 windows$genes <- countOverlaps(windows, genes)
 windows$gypsy <- countOverlaps(windows, gypsy)
 windows$copia <- countOverlaps(windows, copia)
 
-windows_df <- as.data.frame(windows)
+# -----------------------------
+# Save clean window count table
+# -----------------------------
+
+windows_df <- as.data.frame(windows) %>%
+  select(seqnames, start, end, genes, gypsy, copia)
 
 write.table(
   windows_df,
@@ -95,6 +123,7 @@ for (chr in chroms) {
   df_chr <- as.data.frame(windows[seqnames(windows) == chr])
   df_chr$mid <- (df_chr$start + df_chr$end) / 2 / 1e6
   
+  # Gypsy
   p_gypsy <- ggplot(df_chr, aes(x = mid, y = gypsy)) +
     geom_area(fill = "#7B2CBF", alpha = 0.8) +
     labs(
@@ -103,6 +132,7 @@ for (chr in chroms) {
     ) +
     theme_minimal()
   
+  # Copia
   p_copia <- ggplot(df_chr, aes(x = mid, y = copia)) +
     geom_area(fill = "#F4A261", alpha = 0.8) +
     labs(
@@ -111,6 +141,7 @@ for (chr in chroms) {
     ) +
     theme_minimal()
   
+  # Gene annotation density
   p_genes <- ggplot(df_chr, aes(x = mid)) +
     geom_tile(
       aes(y = 1, fill = genes),
