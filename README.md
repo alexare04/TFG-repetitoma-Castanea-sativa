@@ -2,7 +2,7 @@
 
 This repository contains the scripts, summary tables and figures generated during the Bachelor's Thesis:
 
-**Computational analysis of repetitive DNA in the European chestnut (*Castanea sativa* Mill)**
+**Computational analysis of repetitive DNA in the European chestnut (*Castanea sativa* Mill.)**
 
 The main aim of this work was to characterize the repetitive DNA fraction of the *Castanea sativa* reference genome, with special focus on LTR retrotransposons from the *Gypsy* and *Copia* superfamilies.
 
