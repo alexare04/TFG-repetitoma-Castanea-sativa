@@ -36,7 +36,7 @@ plot_output <- "results/figures/Gypsy_Copia_gene_density_correlations.pdf"
 
 df_all <- read_tsv(window_counts_file, show_col_types = FALSE)
 
-# Remove windows without genes
+# Remove windows without gene annotations
 df_all <- df_all %>%
   filter(genes > 0)
 
@@ -88,27 +88,25 @@ write.table(
 # Scatter plots
 # -----------------------------
 
-y_max <- max(c(df_all$gypsy, df_all$copia), na.rm = TRUE)
-
 p_gypsy <- ggplot(df_all, aes(x = genes, y = gypsy)) +
   geom_point(alpha = 0.3, size = 0.7) +
   geom_smooth(method = "lm", color = "black") +
-  scale_y_continuous(limits = c(0, y_max)) +
+  coord_cartesian(ylim = c(0, 200)) +
   labs(
     x = "Genes / 1 Mb",
-    y = "LTRs / 1 Mb",
-    title = "Gypsy vs gene density"
+    y = "LTR retrotransposons / 1 Mb",
+    title = "Relationship between Gypsy density and gene density"
   ) +
   theme_minimal()
 
 p_copia <- ggplot(df_all, aes(x = genes, y = copia)) +
   geom_point(alpha = 0.3, size = 0.7) +
   geom_smooth(method = "lm", color = "black") +
-  scale_y_continuous(limits = c(0, y_max)) +
+  coord_cartesian(ylim = c(0, 200)) +
   labs(
     x = "Genes / 1 Mb",
-    y = "LTRs / 1 Mb",
-    title = "Copia vs gene density"
+    y = "LTR retrotransposons / 1 Mb",
+    title = "Relationship between Copia density and gene density"
   ) +
   theme_minimal()
 
